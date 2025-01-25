@@ -24,8 +24,7 @@ class PresenceStatusButton extends StatelessWidget {
         // Botão "Esperando Confirmação"
         IconButton(
           icon: Icon(Icons.access_time,
-              color:
-                  currentStatus == 'esperando resposta' ? Colors.orange : Colors.grey),
+              color: currentStatus == 'esperando resposta' ? Colors.orange : Colors.grey),
           onPressed: () => onStatusChanged('esperando resposta'),
         ),
         // Botão "Recusado"
