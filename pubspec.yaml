@@ -39,6 +39,7 @@ dependencies:
   cloud_firestore: ^5.6.2
   flutter_email_sender: ^6.0.0
   fl_chart: ^0.70.2
+  intl: ^0.18.0
 
 dev_dependencies:
   flutter_test:

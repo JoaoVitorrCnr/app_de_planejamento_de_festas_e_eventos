@@ -1,8 +1,8 @@
-// home_screen.dart
 import 'package:flutter/material.dart';
 import 'listaConv_screen.dart'; // Importe a tela da lista de convidados
 import 'package:firebase_auth/firebase_auth.dart'; // Importe o Firebase Auth para desconectar
 import 'orcamento_screen.dart'; // Importe a tela de orçamento
+import 'cronograma_screen.dart'; // Importe a tela de cronograma
 
 class HomeScreen extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -85,6 +85,32 @@ class HomeScreen extends StatelessWidget {
               ),
               child: Text(
                 "Controle de Gastos",
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            SizedBox(height: 20), // Espaço entre os botões
+            // Botão para acessar o cronograma
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CronogramaScreen(), // Navega para a tela de cronograma
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.purple,
+                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                "Cronograma",
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.white,
