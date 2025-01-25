@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'signup_screen.dart'; // Importa a tela de cadastro
-import 'cadastro_fornecedor.dart'; // Importa a tela de cadastro de fornecedores
+import 'signup_screen.dart';
+import 'listaConv_screen.dart'; // Importa a tela de cadastro
+// Importa a tela de cadastro de fornecedores
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -30,7 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
         // Redireciona para a tela de cadastro de fornecedores após o login
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => SupplierScreen()),
+          MaterialPageRoute(builder: (context) => GuestListScreen()),
         );
       } catch (e) {
         print("Erro ao logar: $e");
