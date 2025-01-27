@@ -3,6 +3,7 @@ import 'listaConv_screen.dart'; // Importe a tela da lista de convidados
 import 'package:firebase_auth/firebase_auth.dart'; // Importe o Firebase Auth para desconectar
 import 'orcamento_screen.dart'; // Importe a tela de orçamento
 import 'cronograma_screen.dart'; // Importe a tela de cronograma
+import 'todas_empresas_screen.dart'; // Importe a nova tela de todas as empresas
 
 class HomeScreen extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -36,13 +37,19 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: GridView.count(
+          crossAxisCount: 2, // Dois botões por linha
+          crossAxisSpacing: 16, // Espaçamento horizontal entre os botões
+          mainAxisSpacing: 16, // Espaçamento vertical entre os botões
           children: [
             // Botão para acessar a lista de convidados
-            ElevatedButton(
-              onPressed: () {
+            _buildMenuButton(
+              context,
+              "Lista de Convidados",
+              Icons.people,
+              () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -50,25 +57,13 @@ class HomeScreen extends StatelessWidget {
                   ),
                 );
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.purple,
-                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: Text(
-                "Lista de Convidados",
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.white,
-                ),
-              ),
             ),
-            SizedBox(height: 20), // Espaço entre os botões
             // Botão para acessar o controle de gastos
-            ElevatedButton(
-              onPressed: () {
+            _buildMenuButton(
+              context,
+              "Controle de Gastos",
+              Icons.attach_money,
+              () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -76,25 +71,13 @@ class HomeScreen extends StatelessWidget {
                   ),
                 );
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.purple,
-                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: Text(
-                "Controle de Gastos",
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.white,
-                ),
-              ),
             ),
-            SizedBox(height: 20), // Espaço entre os botões
             // Botão para acessar o cronograma
-            ElevatedButton(
-              onPressed: () {
+            _buildMenuButton(
+              context,
+              "Cronograma",
+              Icons.calendar_today,
+              () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -102,22 +85,59 @@ class HomeScreen extends StatelessWidget {
                   ),
                 );
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.purple,
-                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: Text(
-                "Cronograma",
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.white,
-                ),
-              ),
+            ),
+            // Botão para acessar a tela de todas as empresas
+            _buildMenuButton(
+              context,
+              "Fornecedores",
+              Icons.business,
+              () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TodasEmpresasScreen(), // Navega para a tela de todas as empresas
+                  ),
+                );
+              },
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  // Função para construir botões do menu
+  Widget _buildMenuButton(BuildContext context, String title, IconData icon, VoidCallback onPressed) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(15),
+        onTap: onPressed,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 48,
+                color: Colors.purple,
+              ),
+              SizedBox(height: 8),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.purple,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

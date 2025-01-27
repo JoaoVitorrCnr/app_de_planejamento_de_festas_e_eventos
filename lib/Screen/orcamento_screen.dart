@@ -50,7 +50,7 @@ class _OrcamentoScreenState extends State<OrcamentoScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Orçamento e Controle de Gastos',
+          'Controle de Gastos',
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,

@@ -11,15 +11,15 @@ class OrcamentoService {
     return _auth.currentUser?.uid;
   }
 
-  // Cria o banco de dados inicial caso não exista
-  Future<void> criarBancoInicial() async {
+  // Verifica e cria o banco de dados inicial, se necessário
+  Future<void> _verificarECriarBanco() async {
     String? userId = getUserId();
     if (userId == null) throw Exception("Usuário não logado");
 
-    // Verifica se a coleção já existe
-    DocumentSnapshot userDoc = await _firestore.collection('usuarios').doc(userId).get();
+    DocumentSnapshot userDoc =
+        await _firestore.collection('usuarios').doc(userId).get();
     if (!userDoc.exists) {
-      // Cria a coleção inicial com as categorias padrão
+      print("Banco de dados não existe. Criando banco inicial...");
       await _firestore.collection('usuarios').doc(userId).set({
         'despesas': {
           'Decoração': 0.0,
@@ -28,11 +28,31 @@ class OrcamentoService {
           'Outros': 0.0,
         },
       });
+      print("Banco de dados criado com sucesso.");
+    } else {
+      print("Banco de dados já existe.");
+      // Converte o data() para Map<String, dynamic>
+      Map<String, dynamic>? data = userDoc.data() as Map<String, dynamic>?;
+
+      // Verifica se o campo 'despesas' existe
+      if (data == null || !data.containsKey('despesas')) {
+        print("Campo 'despesas' não existe. Criando campo...");
+        await _firestore.collection('usuarios').doc(userId).update({
+          'despesas': {
+            'Decoração': 0.0,
+            'Buffet': 0.0,
+            'Entretenimento': 0.0,
+            'Outros': 0.0,
+          },
+        });
+        print("Campo 'despesas' criado com sucesso.");
+      }
     }
   }
 
   // Salvar ou atualizar uma despesa no Firestore
   Future<void> salvarDespesa(String categoria, double valor) async {
+    await _verificarECriarBanco(); // Garante que o banco de dados existe
     String? userId = getUserId();
     if (userId == null) throw Exception("Usuário não logado");
 
@@ -41,23 +61,39 @@ class OrcamentoService {
     });
   }
 
-  // Carregar todas as despesas do Firestore
   Future<List<Despesa>> carregarDespesas() async {
+    await _verificarECriarBanco(); // Garante que o banco de dados existe
     String? userId = getUserId();
     if (userId == null) throw Exception("Usuário não logado");
 
-    DocumentSnapshot snapshot = await _firestore.collection('usuarios').doc(userId).get();
+    DocumentSnapshot snapshot =
+        await _firestore.collection('usuarios').doc(userId).get();
     if (!snapshot.exists) {
-      await criarBancoInicial(); // Cria o banco inicial se não existir
-      return [
-        Despesa(categoria: 'Decoração', valor: 0.0),
-        Despesa(categoria: 'Buffet', valor: 0.0),
-        Despesa(categoria: 'Entretenimento', valor: 0.0),
-        Despesa(categoria: 'Outros', valor: 0.0),
-      ];
+      print("Documento do usuário não existe.");
+      return [];
     }
 
-    Map<String, dynamic> despesasMap = snapshot['despesas'];
+    // Converte o data() para Map<String, dynamic>
+    Map<String, dynamic>? data = snapshot.data() as Map<String, dynamic>?;
+
+    // Verifica se o campo 'despesas' existe
+    if (data == null || !data.containsKey('despesas')) {
+      print("Campo 'despesas' não existe. Criando campo...");
+      await _firestore.collection('usuarios').doc(userId).update({
+        'despesas': {
+          'Decoração': 0.0,
+          'Buffet': 0.0,
+          'Entretenimento': 0.0,
+          'Outros': 0.0,
+        },
+      });
+      print("Campo 'despesas' criado com sucesso.");
+    }
+
+    // Carrega as despesas
+    Map<String, dynamic> despesasMap = data!['despesas'];
+    print("Dados carregados: $despesasMap");
+
     return despesasMap.entries.map((entry) {
       return Despesa(
         categoria: entry.key,
