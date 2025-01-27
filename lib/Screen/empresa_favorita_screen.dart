@@ -3,8 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../FirestoreService/empresa_favorita_service.dart';
 
 class EmpresasFavoritadasScreen extends StatelessWidget {
-  final EmpresaFavoritaService _empresaFavoritaService =
-      EmpresaFavoritaService();
+  final EmpresaFavoritaService _empresaFavoritaService = EmpresaFavoritaService();
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +16,7 @@ class EmpresasFavoritadasScreen extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.purple, // Cor temática
+        backgroundColor: Colors.purple,
         centerTitle: true,
         elevation: 0,
         iconTheme: IconThemeData(color: Colors.white),
@@ -57,79 +56,98 @@ class EmpresasFavoritadasScreen extends StatelessWidget {
               double avaliacao = dados['avaliacao'] ?? 0.0;
               int quantidadeAvaliacoes = dados['quantidade_avaliacoes'] ?? 0;
 
-              return Card(
-                margin: EdgeInsets.all(8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                elevation: 4,
-                child: InkWell(
-                  onTap: () {
-                    _mostrarDetalhesEmpresa(context, dados);
-                  },
-                  child: Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          nome,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.purple,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          resumo,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Row(
+              // Verifica se a empresa ainda existe no banco principal
+              return FutureBuilder<bool>(
+                future: _empresaFavoritaService.verificarExistenciaDaEmpresa(fornecedorId, empresaId),
+                builder: (context, existeSnapshot) {
+                  if (existeSnapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                      child: CircularProgressIndicator(color: Colors.purple),
+                    );
+                  }
+
+                  // Se a empresa não existe mais no banco principal, remove dos favoritos
+                  if (!existeSnapshot.data!) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _empresaFavoritaService.removerDosFavoritos(empresaId);
+                    });
+                    return SizedBox.shrink(); // Retorna um widget vazio
+                  }
+
+                  // Se a empresa existe, exibe o card normalmente
+                  return Card(
+                    margin: EdgeInsets.all(8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    elevation: 4,
+                    child: InkWell(
+                      onTap: () {
+                        _mostrarDetalhesEmpresa(context, dados);
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(Icons.star, color: Colors.amber, size: 16),
-                            SizedBox(width: 4),
                             Text(
-                              "Avaliação: ${avaliacao.toStringAsFixed(1)}",
+                              nome,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.purple,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              resumo,
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.grey[800],
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Icon(Icons.star, color: Colors.amber, size: 16),
+                                SizedBox(width: 4),
+                                Text(
+                                  "Avaliação: ${avaliacao.toStringAsFixed(1)}",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey[800],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 16),
+                            Center(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  _mostrarDialogoAvaliacao(context, empresaId, fornecedorId);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.purple,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                ),
+                                child: Text(
+                                  "Avaliar",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
                             ),
                           ],
                         ),
-                        SizedBox(height: 16),
-                        Center(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              _mostrarDialogoAvaliacao(
-                                  context, empresaId, fornecedorId);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.purple,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 10),
-                            ),
-                            child: Text(
-                              "Avaliar",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                },
               );
             },
           );
@@ -139,8 +157,7 @@ class EmpresasFavoritadasScreen extends StatelessWidget {
   }
 
   // Mostra os detalhes da empresa em uma nova janela
-  void _mostrarDetalhesEmpresa(
-      BuildContext context, Map<String, dynamic> dados) {
+  void _mostrarDetalhesEmpresa(BuildContext context, Map<String, dynamic> dados) {
     showDialog(
       context: context,
       builder: (context) {
@@ -197,8 +214,7 @@ class EmpresasFavoritadasScreen extends StatelessWidget {
     );
   }
 
-  void _mostrarDialogoAvaliacao(
-      BuildContext context, String empresaId, String fornecedorId) {
+  void _mostrarDialogoAvaliacao(BuildContext context, String empresaId, String fornecedorId) {
     double novaNota = 0;
 
     showDialog(
@@ -259,8 +275,7 @@ class EmpresasFavoritadasScreen extends StatelessWidget {
                         fornecedorId: fornecedorId,
                       );
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content: Text("Avaliação enviada com sucesso!")),
+                        SnackBar(content: Text("Avaliação enviada com sucesso!")),
                       );
                       Navigator.pop(context);
                     } catch (e) {

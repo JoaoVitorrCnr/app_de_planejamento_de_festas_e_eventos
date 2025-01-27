@@ -253,23 +253,23 @@ class _FornecedorHomeScreenState extends State<FornecedorHomeScreen> {
                     },
                     onSaved: (value) => _descricao = value!,
                   ),
-                  TextFormField(
-                    initialValue: _cnpj,
-                    decoration: InputDecoration(
-                      labelText: "CNPJ",
-                      labelStyle: TextStyle(color: Colors.purple),
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.purple),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Por favor, insira o CNPJ";
-                      }
-                      return null;
-                    },
-                    onSaved: (value) => _cnpj = value!,
-                  ),
+                //  TextFormField(
+                  //  initialValue: _cnpj,
+                   // decoration: InputDecoration(
+                    //  labelText: "CNPJ",
+                     // labelStyle: TextStyle(color: Colors.purple),
+                     // focusedBorder: UnderlineInputBorder(
+                     //   borderSide: BorderSide(color: Colors.purple),
+                     // ),
+                  //  ),
+                  //  validator: (value) {
+                    //  if (value == null || value.isEmpty) {
+                    //    return "Por favor, insira o CNPJ";
+                   //   }
+                   //   return null;
+                  //  },
+                  //  onSaved: (value) => _cnpj = value!,
+                 // ),
                 ],
               ),
             ),
@@ -404,11 +404,11 @@ class _FornecedorHomeScreenState extends State<FornecedorHomeScreen> {
                                   style: TextStyle(fontSize: 14),
                                 ),
                                 SizedBox(height: 16),
-                                Text(
-                                  "CNPJ: ${dados['cnpj']}",
-                                  style: TextStyle(fontSize: 14),
-                                ),
-                                SizedBox(height: 16),
+                               // Text(
+                                //  "CNPJ: ${dados['cnpj']}",
+                                 // style: TextStyle(fontSize: 14),
+                               // ),
+                                //SizedBox(height: 16),
                                 Row(
                                   children: [
                                     Icon(Icons.star, color: Colors.amber, size: 16),

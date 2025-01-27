@@ -16,6 +16,23 @@ class EmpresaFavoritaService {
         .collection('favoritados')
         .snapshots();
   }
+   Future<bool> verificarExistenciaDaEmpresa(String fornecedorId, String empresaId) async {
+    try {
+      DocumentSnapshot empresaDoc = await _firestore
+          .collection('fornecedores')
+          .doc(fornecedorId)
+          .collection('empresas')
+          .doc(empresaId)
+          .get();
+      return empresaDoc.exists;
+    } catch (e) {
+      print("Erro ao verificar existência da empresa: $e");
+      return false;
+    }
+  }
+
+  // Busca todas as empresas favoritadas do usuário logad
+
 
   // Adiciona uma empresa aos favoritos do usuário
   Future<void> adicionarAosFavoritos({
