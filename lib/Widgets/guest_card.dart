@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import '../Models/convidado_model.dart';
 import 'presence_status_button.dart';
+
 class GuestCard extends StatelessWidget {
   final Guest guest;
   final VoidCallback onDelete;
@@ -80,9 +81,18 @@ class GuestCard extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          content: PresenceStatusButton(
-                            currentStatus: guest.statusPresenca,
-                            onStatusChanged: onUpdatePresenceStatus,
+                          content: StatefulBuilder(
+                            builder: (context, setState) {
+                              return PresenceStatusButton(
+                                currentStatus: guest.statusPresenca,
+                                onStatusChanged: (newStatus) {
+                                  onUpdatePresenceStatus(newStatus); // Atualiza o status no banco de dados
+                                  setState(() {
+                                    guest.statusPresenca = newStatus; // Atualiza o estado local
+                                  });
+                                },
+                              );
+                            },
                           ),
                           actions: [
                             TextButton(

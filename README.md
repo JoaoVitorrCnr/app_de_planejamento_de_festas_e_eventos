@@ -1,16 +1,28 @@
 # app_de_planejamento_de_festas_e_eventos
 
-A new Flutter project.
+Um aplicativo completo para organização de festas e eventos sociais, permitindo 
+gerenciar listas de convidados, orçamento, cronograma e fornecedores. Indicado 
+tanto para eventos pequenos quanto para grandes celebrações. 
 
-## Getting Started
+Requisitos Funcionais: 
 
-This project is a starting point for a Flutter application.
+1. Lista de Convidados 
+o Adição de contatos, status de confirmação de presença (RSVP) e 
+envio de convites personalizados por e-mail ou mensagem. 
 
-A few resources to get you started if this is your first Flutter project:
+2. Orçamento e Controle de Gastos 
+o Registro de despesas com categorias como decoração, buffet e 
+entretenimento. 
+o Relatórios visuais com gráficos sobre o uso do orçamento. 
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+3. Cronograma do Evento 
+o Planejamento detalhado de horários e atividades durante o evento. 
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+4. Catálogo de Fornecedores 
+o Pesquisa e cadastro de fornecedores com informações de contato e 
+avaliações de outros usuários. 
+
+5. Lista de Tarefas 
+o Ferramenta de checklist para garantir que tudo seja realizado a 
+tempo. 
+

@@ -4,7 +4,6 @@ import '../Models/convidado_model.dart';
 import '../FirestoreService/convidado_service.dart';
 import '../Widgets/guest_card.dart'; // Importando a classe GuestCard
 
-
 class GuestListScreen extends StatefulWidget {
   @override
   _GuestListScreenState createState() => _GuestListScreenState();
@@ -90,7 +89,7 @@ class _GuestListScreenState extends State<GuestListScreen> {
                   await _convidadoService.addGuest(
                     name: name,
                     email: email,
-                    statusPresenca: 'esperando', // Status padrão
+                    statusPresenca: 'esperando resposta', // Status padrão
                   );
 
                   Navigator.pop(context); // Fecha o diálogo
@@ -385,7 +384,8 @@ class _GuestListScreenState extends State<GuestListScreen> {
                   Navigator.pop(context); // Fecha o diálogo
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Preencha o título e o corpo do email.')),
+                    SnackBar(
+                        content: Text('Preencha o título e o corpo do email.')),
                   );
                 }
               },
@@ -412,10 +412,11 @@ class _GuestListScreenState extends State<GuestListScreen> {
     return regex.hasMatch(email);
   }
 
-  // Função para atualizar o status de presença
+// guest_list_screen.dart
   Future<void> _updatePresenceStatus(
       String guestId, String statusPresenca) async {
     await _convidadoService.updatePresenceStatus(guestId, statusPresenca);
+    // O StreamBuilder já atualiza a interface automaticamente
   }
 
   @override

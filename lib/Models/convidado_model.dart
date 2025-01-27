@@ -2,7 +2,7 @@ class Guest {
   final String id;
   final String name;
   final String email;
-  final String statusPresenca; // Novo campo
+  String statusPresenca; // Novo campo
 
   Guest({
     required this.id,

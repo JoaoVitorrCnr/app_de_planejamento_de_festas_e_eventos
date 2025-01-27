@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'signup_screen.dart';
-import 'listaConv_screen.dart'; // Importa a tela de cadastro
-// Importa a tela de cadastro de fornecedores
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'home_screen.dart'; // Tela inicial do usuário normal
+import 'fornecedor_home_screen.dart'; // Tela inicial do fornecedor
+import 'signup_screen.dart'; // Tela de cadastro
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -19,25 +20,73 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       try {
+        // Faz o login com e-mail e senha
         UserCredential userCredential = await _auth.signInWithEmailAndPassword(
           email: _email,
           password: _password,
         );
-        print("Usuário logado: ${userCredential.user!.email}");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Login realizado com sucesso!")),
-        );
 
-        // Redireciona para a tela de cadastro de fornecedores após o login
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => GuestListScreen()),
-        );
+        // Obtém o UID do usuário logado
+        String uid = userCredential.user!.uid;
+        print("UID do usuário logado: $uid"); // Print do UID
+
+        // Verifica se o UID está na coleção `fornecedores`
+        DocumentSnapshot fornecedorDoc = await FirebaseFirestore.instance
+            .collection('fornecedores')
+            .doc(uid)
+            .get();
+
+        if (fornecedorDoc.exists) {
+          print("Usuário identificado como FORNECEDOR."); // Print de depuração
+
+          // Verifica se o widget ainda está montado antes de redirecionar
+          if (mounted) {
+            // Se o UID está na coleção `fornecedores`, redireciona para a tela de fornecedor
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => FornecedorHomeScreen()),
+            );
+          }
+        } else {
+          // Se não está na coleção `fornecedores`, verifica se está na coleção `usuarios`
+          DocumentSnapshot usuarioDoc = await FirebaseFirestore.instance
+              .collection('usuarios')
+              .doc(uid)
+              .get();
+
+          if (usuarioDoc.exists) {
+            print(
+                "Usuário identificado como USUÁRIO NORMAL."); // Print de depuração
+
+            // Verifica se o widget ainda está montado antes de redirecionar
+            if (mounted) {
+              // Se o UID está na coleção `usuarios`, redireciona para a tela de usuário normal
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => HomeScreen()),
+              );
+            }
+          } else {
+            print("Usuário NÃO ENCONTRADO nas coleções."); // Print de depuração
+
+            // Verifica se o widget ainda está montado antes de exibir a mensagem de erro
+            if (mounted) {
+              // Se o UID não está em nenhuma das coleções, exibe uma mensagem de erro
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Usuário não encontrado.")),
+              );
+            }
+          }
+        }
       } catch (e) {
-        print("Erro ao logar: $e");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Erro ao logar: $e")),
-        );
+        print("Erro ao logar: $e"); // Print de erro
+
+        // Verifica se o widget ainda está montado antes de exibir a mensagem de erro
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Erro ao logar: $e")),
+          );
+        }
       }
     }
   }
@@ -53,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.purple, // Cor temática
+        backgroundColor: Colors.purple,
         centerTitle: true,
         elevation: 0,
       ),
@@ -72,9 +121,8 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Ícone ou logo do aplicativo
                 Icon(
-                  Icons.celebration, // Ícone de festa
+                  Icons.celebration,
                   size: 80,
                   color: Colors.white,
                 ),
@@ -89,7 +137,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 30),
-                // Campo de e-mail
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: "E-mail",
@@ -112,7 +159,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   onSaved: (value) => _email = value!,
                 ),
                 SizedBox(height: 20),
-                // Campo de senha
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: "Senha",
@@ -136,7 +182,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   onSaved: (value) => _password = value!,
                 ),
                 SizedBox(height: 30),
-                // Botão de entrar
                 ElevatedButton(
                   onPressed: _signIn,
                   style: ElevatedButton.styleFrom(
@@ -156,7 +201,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 SizedBox(height: 20),
-                // Link para cadastro
                 TextButton(
                   onPressed: () {
                     Navigator.push(
@@ -168,7 +212,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     "Não tem uma conta? Cadastre-se",
                     style: TextStyle(
                       color: Colors.white,
-                      //decoration: TextDecoration.underline,
                     ),
                   ),
                 ),

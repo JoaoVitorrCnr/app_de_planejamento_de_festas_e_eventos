@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../Screen/login_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -11,20 +13,42 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
   String _email = '';
   String _password = '';
+  bool _isFornecedor = false; // Variável para controlar o tipo de cadastro
 
   Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       try {
-        UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        UserCredential userCredential =
+            await _auth.createUserWithEmailAndPassword(
           email: _email,
           password: _password,
         );
+
+        // Se for fornecedor, salva o UID na coleção `fornecedores`
+        if (_isFornecedor) {
+          await FirebaseFirestore.instance
+              .collection('fornecedores')
+              .doc(userCredential.user!.uid)
+              .set({}); // Sem campos adicionais, apenas o documento com o UID
+        } else {
+          // Se for usuário normal, salva o UID na coleção `usuarios`
+          await FirebaseFirestore.instance
+              .collection('usuarios')
+              .doc(userCredential.user!.uid)
+              .set({}); // Sem campos adicionais, apenas o documento com o UID
+        }
+
         print("Usuário cadastrado: ${userCredential.user!.email}");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Cadastro realizado com sucesso!")),
         );
-        Navigator.pop(context); // Volta para a tela anterior após o cadastro
+
+        // Redireciona para a tela de login após o cadastro
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+        );
       } catch (e) {
         print("Erro ao cadastrar: $e");
         ScaffoldMessenger.of(context).showSnackBar(
@@ -45,7 +69,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.purple, // Cor temática
+        backgroundColor: Colors.purple,
         centerTitle: true,
         elevation: 0,
       ),
@@ -64,9 +88,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Ícone ou logo do aplicativo
                 Icon(
-                  Icons.celebration, // Ícone de festa
+                  Icons.celebration,
                   size: 80,
                   color: Colors.white,
                 ),
@@ -81,7 +104,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 30),
-                // Campo de e-mail
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: "E-mail",
@@ -104,7 +126,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   onSaved: (value) => _email = value!,
                 ),
                 SizedBox(height: 20),
-                // Campo de senha
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: "Senha",
@@ -127,8 +148,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   },
                   onSaved: (value) => _password = value!,
                 ),
+                SizedBox(height: 20),
+                // Botão para selecionar o tipo de cadastro
+                Row(
+                  children: [
+                    Text(
+                      "Sou fornecedor",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    Switch(
+                      value: _isFornecedor,
+                      onChanged: (value) {
+                        setState(() {
+                          _isFornecedor = value;
+                        });
+                      },
+                      activeColor: Colors.purple,
+                    ),
+                  ],
+                ),
                 SizedBox(height: 30),
-                // Botão de cadastrar
                 ElevatedButton(
                   onPressed: _signUp,
                   style: ElevatedButton.styleFrom(
